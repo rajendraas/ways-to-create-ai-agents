@@ -16,7 +16,7 @@ Access the API -
 curl --request POST \
   --url http://localhost:8080/chat \
   --data '{
-	"message": "Hi, how are you ?"
+	"message": "What the temperature today at location with longitude 18.6536809 and longitude 73.7298879 ?"
 }'
 ```
 
