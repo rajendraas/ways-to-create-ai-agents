@@ -3,11 +3,13 @@ package io.github.rajendrasatpute.sample_spring_ai_agent.tools;
 import io.github.rajendrasatpute.sample_spring_ai_agent.client.OpenMeteoClient;
 import io.github.rajendrasatpute.sample_spring_ai_agent.dto.WeatherResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 public class WeatherTool {
     private final OpenMeteoClient openMeteoClient;
@@ -17,7 +19,7 @@ public class WeatherTool {
             @ToolParam(description = "The location latitude") String latitude,
             @ToolParam(description = "The location longitude") String longitude
     ) {
-
+        log.info("weatherForecast: Provided location - " + latitude + ", " + longitude);
         WeatherResponse weatherResponse = openMeteoClient.getWeather(latitude, longitude);
 
         return weatherResponse;
