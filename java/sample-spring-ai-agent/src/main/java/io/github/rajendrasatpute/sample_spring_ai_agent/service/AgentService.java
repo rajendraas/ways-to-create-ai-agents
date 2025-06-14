@@ -1,14 +1,16 @@
 package io.github.rajendrasatpute.sample_spring_ai_agent.service;
 
-import io.github.rajendrasatpute.sample_spring_ai_agent.tools.DateTimeTools;
-import io.github.rajendrasatpute.sample_spring_ai_agent.tools.SunriseSunsetTool;
-import io.github.rajendrasatpute.sample_spring_ai_agent.tools.WeatherTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.stereotype.Service;
+
+import io.github.rajendrasatpute.sample_spring_ai_agent.tools.DateTimeTools;
+import io.github.rajendrasatpute.sample_spring_ai_agent.tools.SunriseSunsetTool;
 
 @Service
 @Slf4j
@@ -16,7 +18,7 @@ import java.util.Map;
 public class AgentService {
 
     private final ChatClient chatClient;
-    private final WeatherTool weatherTool;
+    private final ToolCallbackProvider tools;
     private final SunriseSunsetTool sunriseSunsetTool;
     private final DateTimeTools dateTimeTools;
 
@@ -53,15 +55,17 @@ public class AgentService {
         log.debug("\nAvailable routes: " + availableRoutes);
 
         String selectorPrompt = String.format("""
-                Analyze the input and select the most appropriate specialist only from these options: %s
+                A query about Sunset times is related to sunset.
+                A query about Weather, temperature, rain forcast or wind speed is related to weather.
+                Analyze the input and select either weather or sunset or generic as the most appropriate term for the query.
                 First explain your reasoning, then provide your selection in this JSON format:
 
                 \\{
-                    "reasoning": "Brief explanation of why this query should be routed to a specific specialist.",
-                    "selection": "The chosen specialist name"
+                    "reasoning": "Brief explanation of why this query should be routed to a specific term.",
+                    "selection": "The chosen term"
                 \\}
 
-                Input: %s""", availableRoutes, input);
+                Input: %s""", input);
 
         log.debug(selectorPrompt);
 
@@ -83,17 +87,6 @@ public class AgentService {
                 .content();
     }
 
-    private String weather(String prompt) {
-        return chatClient
-                .prompt(prompt)
-                .tools(
-                        this.dateTimeTools,
-                        this.weatherTool
-                )
-                .call()
-                .content();
-    }
-
     private String sunset(String prompt) {
         return chatClient
                 .prompt(prompt)
@@ -101,6 +94,14 @@ public class AgentService {
                         this.dateTimeTools,
                         this.sunriseSunsetTool
                 )
+                .call()
+                .content();
+    }
+
+    private String weather(String prompt) {
+        return chatClient
+                .prompt(prompt)
+                .toolCallbacks(tools)
                 .call()
                 .content();
     }
