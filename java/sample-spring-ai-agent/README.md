@@ -11,12 +11,14 @@ To run the server locally -
 
 You dont need to run Tomcat server seperately to run this project. Spring Boot run embedde tomcat server.
 
+Swagger - http://localhost:8080/swagger-ui/index.html
+
 Access the API -
 ```sh
 curl --request POST \
   --url http://localhost:8080/chat \
   --data '{
-	"message": "What the temperature today at location with longitude 18.6536809 and longitude 73.7298879 ?"
+	"message": "What the temperature today at location with longitude 18.6536809 and latitude 73.7298879 ?"
 }'
 ```
 

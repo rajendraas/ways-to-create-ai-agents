@@ -28,9 +28,9 @@ public class AgentService {
                     	You are a weather specialist. You deal with temperature for any location. Always start with "Weather details:"
                     	Input: 
                     """,
-            "sunset",
+            "times",
             """
-                    	You are a sunset specialist. You deal with sunset time for any location. Always start with "Sunset details:"
+                    	You are a specialist for sunset and sunrise times at any specific location. Always start with "Time details:"
                     	Input: 
                     """
     );
@@ -44,8 +44,8 @@ public class AgentService {
 
         if (routeKey.toLowerCase().contains("weather")) {
             return this.weather(specialistRoutes.get("weather") + userPrompt);
-        } else if (routeKey.toLowerCase().contains("sunset")) {
-            return this.sunset(specialistRoutes.get("sunset") + userPrompt);
+        } else if (routeKey.toLowerCase().contains("times")) {
+            return this.sunset(specialistRoutes.get("times") + userPrompt);
         }
 
         return this.defaultQuery(userPrompt);
@@ -55,15 +55,17 @@ public class AgentService {
         log.debug("\nAvailable routes: " + availableRoutes);
 
         String selectorPrompt = String.format("""
-                A query about Sunset times is related to sunset.
-                A query about Weather, temperature, rain forcast or wind speed is related to weather.
-                Analyze the input and select either weather or sunset or generic as the most appropriate term for the query.
-                First explain your reasoning, then provide your selection in this JSON format:
+                You are an export in query analysis. You will be given a query and based on that return the selection.
 
-                \\{
+                ## Instructions:
+                1. A query asking about time at specific location is related to times.
+                2. A query about Weather, temperature, rain forcast or wind speed at specific location is related to weather.
+                3. First explain your reasoning, then provide your selection in this JSON format:
+
+                "{
                     "reasoning": "Brief explanation of why this query should be routed to a specific term.",
-                    "selection": "The chosen term"
-                \\}
+                    "selection": "Make sure you only return one of weather, times or generic as selection."
+                }"
 
                 Input: %s""", input);
 
